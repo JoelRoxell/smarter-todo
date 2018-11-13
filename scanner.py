@@ -24,10 +24,7 @@ def get_issues_from_file(file_path):
     with open(file_path) as file:
         for data in filter(
             lambda x: x[0] is not None,
-            [
-                extract_data_from_line(line)
-                for line in file.read().split('\n')
-            ]
+            [extract_data_from_line(line) for line in file.read().split('\n')]
         ):
             yield Issue(
                 str.strip(data[0].group(1)),
@@ -38,11 +35,10 @@ def get_issues_from_file(file_path):
 
 def get_issues(directory, issues=[]):
     for dir_name, subs, file_list in os.walk(directory):
-        for file in file_list:
-            file_path = os.path.abspath("{}/{}".format(dir_name, file))
-
-            if os.path.isfile(file_path):
-                issues += get_issues_from_file(file_path)
+        for file_path in filter(lambda x: os.path.isfile(x), map(
+            lambda x: os.path.abspath("{}/{}".format(dir_name, x)), file_list
+        )):
+            issues += get_issues_from_file(file_path)
 
     return issues
 
