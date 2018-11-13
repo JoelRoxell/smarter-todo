@@ -1,8 +1,8 @@
 import os
 import re
 
-core_dir = './sample'
-issues = []
+
+CORE_DIR = './sample'
 
 
 class Issue():
@@ -12,30 +12,38 @@ class Issue():
         self.estimate = estimate
 
 
-for dir_name, subs, file_list in os.walk(core_dir):
-    print(subs, file_list)
+def extract_data_from_line(line):
+    return\
+        re.search(r'TODO:(.*?)\[', line),\
+        re.search(r'\[(.*?)\]', line),\
+        re.search(r'([0-9]+[m|h])', line)
 
-    for file in file_list:
-        file_path = os.path.abspath("{}/{}".format(dir_name, file))
 
-        if not os.path.isfile(file_path):
-            break
+def get_issues_from_file(file_path):
+    with open(file_path) as file:
+        return [
+            Issue(
+                str.strip(data[0].group(1)),
+                data[1].group(1).split(','),
+                data[2].group(1)
+            ) for data in filter(
+                lambda x: x[0] is not None, [
+                    extract_data_from_line(line)
+                    for line in file.read().split('\n')
+                ]
+            )
+        ]
 
-        with open(file_path) as file:
-            next_line = file.readline()
 
-            while (len(next_line)):
-                todo = re.search(r'TODO:(.*?)\[', next_line)
-                labels = re.search(r'\[(.*?)\]', next_line)
-                estimate = re.search(r'([0-9]+[m|h])', next_line)
+def get_issues(directory, issues=[]):
+    for dir_name, subs, file_list in os.walk(directory):
+        for file_path in filter(lambda x: os.path.isfile(x), map(
+            lambda x: os.path.abspath("{}/{}".format(dir_name, x)), file_list
+        )):
+            issues += get_issues_from_file(file_path)
 
-                if todo:
-                    todo = str.strip(todo.group(1))
-                    labels = labels.group(1).split(',')
-                    estimate = estimate.group(1)
+    return issues
 
-                    issues.append(Issue(todo, labels, estimate))
 
-                next_line = file.readline()
-
-print(issues)
+for issue in get_issues(CORE_DIR):
+    print(issue.__dict__)
