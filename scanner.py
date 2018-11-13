@@ -21,15 +21,18 @@ def extract_data_from_line(line):
 
 def get_issues_from_file(file_path):
     with open(file_path) as file:
-        for data in filter(
-            lambda x: x[0] is not None,
-            [extract_data_from_line(line) for line in file.read().split('\n')]
-        ):
-            yield Issue(
+        return [
+            Issue(
                 str.strip(data[0].group(1)),
                 data[1].group(1).split(','),
                 data[2].group(1)
+            ) for data in filter(
+                lambda x: x[0] is not None, [
+                    extract_data_from_line(line)
+                    for line in file.read().split('\n')
+                ]
             )
+        ]
 
 
 def get_issues(directory, issues=[]):
