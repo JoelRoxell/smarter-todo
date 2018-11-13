@@ -13,11 +13,10 @@ class Issue():
 
 
 def extract_data_from_line(line):
-    return (
-        re.search(r'TODO:(.*?)\[', line),
-        re.search(r'\[(.*?)\]', line),
+    return\
+        re.search(r'TODO:(.*?)\[', line),\
+        re.search(r'\[(.*?)\]', line),\
         re.search(r'([0-9]+[m|h])', line)
-    )
 
 
 def get_issues_from_file(file_path):
