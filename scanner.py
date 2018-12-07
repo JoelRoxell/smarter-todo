@@ -1,49 +1,83 @@
+from __future__ import annotations
+from typing import Iterable, Tuple, NamedTuple, Optional, Dict, List
 import os
 import re
+import functools
 
+from functional.composition import compose
 
 CORE_DIR = './sample'
+pattern = re.compile(
+    r'^(?:\s*(?://|\*))?\s*TODO:\s*(?P<description>.*?)\s*'
+    r'(?:\[(?P<labels>[A-z0-9_\-\s,]+)]\s*)?'
+    r'(?:(?P<estimate>[0-9]+[mh])\s*)?$')
+filter_files = functools.partial(filter, lambda x: os.path.isfile(x))
+
+Lines = Iterable[Tuple[str, int, str]]
 
 
-class Issue():
-    def __init__(self, description, labels, estimate):
-        self.description = description
-        self.labels = labels
-        self.estimate = estimate
+class Issue(NamedTuple):
+    file_path: str
+    line: int
+    description: str
+    labels: List[Label]
+    estimate: Optional[str]
 
 
-def extract_data_from_line(line):
-    return\
-        re.search(r'TODO:(.*?)\[', line),\
-        re.search(r'\[(.*?)\]', line),\
-        re.search(r'([0-9]+[m|h])', line)
+class Label:
+    __registry: Dict[str, Label] = {}
+
+    def __new__(cls, name: str):
+        if name in cls.__registry:
+            return cls.__registry[name]
+        return super(Label, cls).__new__(cls)
+
+    def __hash__(self):
+        return hash(self.name)
+
+    def __eq__(self, other):
+        return hash(self) == hash(other)
+
+    def __init__(self, name: str):
+        self.name = name
+
+    def __str__(self):
+        return self.name
 
 
-def get_issues_from_file(file_path):
-    with open(file_path) as file:
-        return [
-            Issue(
-                str.strip(data[0].group(1)),
-                data[1].group(1).split(','),
-                data[2].group(1)
-            ) for data in filter(
-                lambda x: x[0] is not None, [
-                    extract_data_from_line(line)
-                    for line in file.read().split('\n')
-                ]
-            )
-        ]
+def get_files(directory: str) -> Iterable[str]:
+    for dir_name, _, file_list in os.walk(directory):
+        make_abs = functools.partial(
+            map, lambda x: os.path.abspath(os.path.join(dir_name, x)))
+        yield from filter_files(make_abs(file_list))
 
 
-def get_issues(directory, issues=[]):
-    for dir_name, subs, file_list in os.walk(directory):
-        for file_path in filter(lambda x: os.path.isfile(x), map(
-            lambda x: os.path.abspath("{}/{}".format(dir_name, x)), file_list
-        )):
-            issues += get_issues_from_file(file_path)
-
-    return issues
+def get_lines(file_paths: Iterable[str]) -> Lines:
+    for file_path in file_paths:
+        with open(file_path, 'r') as f:
+            for n, line in enumerate(f.readlines()):
+                yield file_path, n, line.strip()
 
 
-for issue in get_issues(CORE_DIR):
-    print(issue.__dict__)
+def get_labels(label_string: Optional[str]) -> Iterable[Label]:
+    if not label_string:
+        return
+    for s in label_string.split(','):
+        yield Label(s.strip())
+
+
+def get_issues(lines: Lines) -> Iterable[Issue]:
+    for path, n, line in lines:
+        match = pattern.match(line)
+        if not match: continue
+        description, label_string, estimate = match.groups()
+        labels = list(get_labels(label_string))
+        yield Issue(path, n, description, labels, estimate)
+
+
+scan = compose(get_issues, get_lines, get_files)
+
+if __name__ == '__main__':
+    import json
+    for issue in scan(CORE_DIR):
+        print(json.dumps(issue._asdict(), indent=4, default=lambda o: str(o)))
