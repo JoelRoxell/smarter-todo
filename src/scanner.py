@@ -2,7 +2,8 @@ import os
 import re
 import string
 import argparse
-from multiprocessing.pool import Pool
+import multiprocessing
+
 
 from github_integration import Github
 from models.issue import Issue
@@ -68,7 +69,7 @@ if __name__ == "__main__":
         dest='CPUs',
         type=int,
         help='allowed threading capabilities',
-        default=4
+        default=multiprocessing.cpu_count()
     )
 
     config = parser.parse_args()
@@ -84,4 +85,4 @@ if __name__ == "__main__":
             issue.to_github_issue()
         )
 
-    Pool(processes=config.CPUs).map(create_issue, issues)
+    multiprocessing.Pool(processes=config.CPUs).map(create_issue, issues)
