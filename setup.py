@@ -5,7 +5,8 @@ setup(
     name='smartertodo',
     version='',
     install_requires=[
-        'requests'
+        'requests',
+        'tabulate'
     ],
     packages=find_packages(),
     entry_points={

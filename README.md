@@ -18,9 +18,11 @@ Create issues from TODO comments.
 
     smartertodo --path=sample --dry=true
     
-    {'estimate': '2h', 'labels': ['discuss', 'test'], 'title': 'Should pass system configuration as a param. and this comment has multiple lines.'}
-    {'estimate': '45m', 'labels': ['critical', 'test'], 'title': 'Should return a new issue'}
-    {'estimate': '10m', 'labels': ['normal', 'frontend', 'test'], 'title': 'This is the sub.'}
+    estimate    labels                          title
+    ----------  ------------------------------  ---------------------------------------------------------------------------------
+    2h          ['discuss', 'test']             Should pass system configuration as a param. and this comment has multiple lines.
+    45m         ['critical', 'test']            Should return a new issue
+    10m         ['normal', 'frontend', 'test']  This is the sub.
 
 ## Running the tests
 > To run the tests:

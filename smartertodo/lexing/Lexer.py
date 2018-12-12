@@ -30,9 +30,11 @@ class Lexer(object):
         if self.char == '\n':
             self.line += 1
 
-        if self.index < len(self.text) - 1 and self.char != '\0':
+        if self.index < len(self.text) - 1:
             self.index += 1
             self.char = self.text[self.index]
+        else:
+            self.char = '\0'
 
     def peek(self):
         '''
@@ -80,9 +82,12 @@ class Lexer(object):
         text = ''
         comment_type = self.char
         firstchar = self.char
-        self.advance
+        self.advance()
         while firstchar == comment_type and self.char != '\0':
-            if self.char != firstchar and self.char != '\n':
+            if not is_valid(self.char):
+                break
+
+            if self.char != firstchar:
                 text += self.char
 
             if self.char == '\n':
@@ -97,9 +102,6 @@ class Lexer(object):
                     break
             else:
                 self.advance()
-
-            if not is_valid(self.char):
-                break
 
         return Token(TokenType.COMMENT, text, self.line, self.index)
 

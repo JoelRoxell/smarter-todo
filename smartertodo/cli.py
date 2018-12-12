@@ -2,8 +2,9 @@ import re
 import argparse
 import multiprocessing
 
-from smartertodo.comments import get_comments_from_directory
+from tabulate import tabulate
 
+from smartertodo.comments import get_comments_from_directory
 
 from github_integration import Github
 from models.issue import Issue
@@ -21,10 +22,12 @@ def get_issues_from_comments(comments):
     return [
         Issue(
             str.strip(data[0].group(1)),
-            data[1].group(1).replace(' ', '').split(','),
+            data[1].group(1).replace(' ', '').split(',')
+            if len(data) > 1 and data[1] else None,
             data[2].group(1)
+            if len(data) > 2 and data[2] else None
         ) for data in filter(
-            lambda x: x[0] is not None, [
+            lambda x: len(x) > 0 and x[0] is not None, [
                 extract_data_from_text(comment.value.replace('\n', ''))
                 for comment in comments
             ]
@@ -75,8 +78,7 @@ def run():
     issues = get_issues(config.project_path)
 
     if config.dry:
-        for issue in issues:
-            print(issue.__dict__)
+        print(tabulate([issue.__dict__ for issue in issues], headers='keys'))
     else:
         def create_issue(issue):
             print('Creating: {}'.format(issue.title))
