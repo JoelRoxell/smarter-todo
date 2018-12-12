@@ -35,8 +35,13 @@ def get_issues_from_comments(comments):
     ]
 
 
-def get_issues(directory):
-    return get_issues_from_comments(get_comments_from_directory(directory))
+def get_issues(directory, print_directories=False):
+    return get_issues_from_comments(
+        get_comments_from_directory(
+            directory,
+            print_directories
+        )
+    )
 
 
 def run():
@@ -72,10 +77,16 @@ def run():
         type=bool,
         help='Only print issues'
     )
+    parser.add_argument(
+        '--print-directories',
+        type=bool,
+        default=False,
+        help='Print directories'
+    )
 
     config = parser.parse_args()
 
-    issues = get_issues(config.project_path)
+    issues = get_issues(config.project_path, config.print_directories)
 
     if config.dry:
         print(tabulate([issue.__dict__ for issue in issues], headers='keys'))
