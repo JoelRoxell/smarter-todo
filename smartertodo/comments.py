@@ -17,11 +17,16 @@ def get_comments_from_text(text):
     return tokens
 
 
-def get_comments_from_directory(directory):
+def get_comments_from_directory(directory, print_directories=False):
     comments = []
     for root, subdirs, files in os.walk(directory):
         for filename in files:
+            dirname = os.path.join(root, filename)
+
+            if print_directories:
+                print(dirname)
+
             comments = comments + get_comments_from_text(
-                open(os.path.join(root, filename)).read())
+                open(dirname).read())
 
     return comments
