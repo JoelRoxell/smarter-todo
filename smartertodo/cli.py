@@ -11,7 +11,6 @@ from models.issue import Issue
 
 def extract_data_from_text(text):
     # TODO: add regexe(s) for: assignees and body?
-    # FIXME: .Comments may stretch multiple lines.
     return\
         re.search(r'TODO:(.*?)\[', text),\
         re.search(r'\[(.*?)\]', text),\
