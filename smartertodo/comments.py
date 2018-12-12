@@ -1,16 +1,17 @@
 from smartertodo.lexing.Lexer import Lexer
+from smartertodo.lexing.Token import TokenType
 import os
 
 
 def get_comments_from_text(text):
     lexer = Lexer(text)
     token = lexer.get_next_token()
-    tokens = [token] if 'comment' in token.token_type.lower() else []
+    tokens = [token] if token.token_type == TokenType.COMMENT else []
 
-    while token.token_type != 'EOF':
+    while token.token_type != TokenType.EOF:
         token = lexer.get_next_token()
 
-        if 'comment' in token.token_type.lower():
+        if token.token_type == TokenType.COMMENT:
             tokens.append(token)
 
     return tokens

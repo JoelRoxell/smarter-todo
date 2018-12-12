@@ -1,4 +1,4 @@
-from smartertodo.lexing.Token import Token
+from smartertodo.lexing.Token import Token, TokenType
 
 
 def is_valid(char):
@@ -63,7 +63,7 @@ class Lexer(object):
 
             self.advance()
 
-        return Token('EOF', None, self.line, self.index)
+        return Token(TokenType.EOF, None, self.line, self.index)
 
     def skip_invalid(self):
         '''
@@ -101,7 +101,7 @@ class Lexer(object):
             if not is_valid(self.char):
                 break
 
-        return Token('COMMENT_BLOCK', text, self.line, self.index)
+        return Token(TokenType.COMMENT, text, self.line, self.index)
 
     def lex_c_comment_block(self):
         '''
@@ -117,4 +117,4 @@ class Lexer(object):
             if self.char == '*' and self.peek() == '/':
                 break
 
-        return Token('C_COMMENT_BLOCK', text, self.line, self.index)
+        return Token(TokenType.COMMENT, text, self.line, self.index)
