@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='smartertodo',
-    version='1.0.2',
+    version='1.0',
     install_requires=[
         'requests',
         'tabulate'
