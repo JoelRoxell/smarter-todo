@@ -2,7 +2,7 @@ import requests
 from os import getenv
 
 
-class Github:
+class GithubIntegration:
     ROOT = 'https://api.github.com/'
 
     def __init__(self, owner, repository):
@@ -11,7 +11,7 @@ class Github:
 
     def createIssue(self, issue):
         url = '{}repos/{owner}/{repository}/issues?access_token={}'.format(
-            Github.ROOT,
+            GithubIntegration.ROOT,
             getenv('GITHUB_ACCESS_TOKEN'),
             ** vars(self)
         )
