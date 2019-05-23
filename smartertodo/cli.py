@@ -1,13 +1,11 @@
 import re
 import argparse
 import multiprocessing
-
 from tabulate import tabulate
 
 from smartertodo.comments import get_comments_from_directory
-
-from github_integration import Github
-from models.issue import Issue
+from smartertodo.GithubIntegration import GithubIntegration
+from smartertodo.models.Issue import Issue
 
 
 def extract_data_from_text(text):
@@ -95,8 +93,12 @@ def run():
             print('Creating: {}'.format(issue.title))
             print(vars(issue))
 
-            Github(config.owner, config.target).createIssue(
+            GithubIntegration(config.owner, config.target).createIssue(
                 issue.to_github_issue()
             )
 
         multiprocessing.Pool(processes=config.CPUs).map(create_issue, issues)
+
+
+if __name__ == "__main__":
+    run()

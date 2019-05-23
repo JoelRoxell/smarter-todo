@@ -30,9 +30,9 @@ def test_get_comments_from_text():
 
     assert comments[0].value == ' nice function '
     assert comments[1].value == '\n     This is a long\n     comment\n     with multiple\n     lines\n    '  # NOQA E501
-    assert comments[2].value == ' This is an inline comment'
-    assert comments[3].value == ' with multiple lines'
+    assert comments[2].value == ' This is an inline comment\n'
+    assert comments[3].value == ' with multiple lines\n'
     assert comments[4].value == ' comment next to something '
-    assert comments[5].value == ' also comment next to something'
-    assert comments[6].value == ' this is another style of comment'
-    assert comments[7].value == ' next'
+    assert comments[5].value == ' also comment next to something\n'
+    assert comments[6].value == ' this is another style of comment\n'
+    assert comments[7].value == ' next\n'

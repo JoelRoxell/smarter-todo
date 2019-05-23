@@ -4,8 +4,11 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+requests = "*"
+tabulate = "*"
 
 [dev-packages]
+"autopep8" = "*"
 
 [requires]
-python_version = "3.6"
+python_version = "3.7"
